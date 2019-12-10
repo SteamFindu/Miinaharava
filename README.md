@@ -1,5 +1,7 @@
 # Miinaharava
-Basic and bad minesweeper created in c# using winforms
+Basic and bad minesweeper built as a school project.
+
+Created in c# using winforms
 
 Main code is in Form1.cs
 

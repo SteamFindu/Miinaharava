@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,6 +20,7 @@ namespace Miinaharawa
         private List<Control> AlreadyCleared = new List<Control>();
         private List<Control> Flagged = new List<Control>();
         Random rnd = new Random();
+        Stopwatch sp = new Stopwatch();
 
         public Form1()
         {
@@ -56,10 +58,10 @@ namespace Miinaharawa
                         Mines = 40;
                         break;
                     case 3:
-                        tableLayoutPanel1.ColumnCount = 30;
-                        tableLayoutPanel1.RowCount = 16;
-                        this.Width += 535;
-                        this.Height += 170;
+                        tableLayoutPanel1.ColumnCount = 22;
+                        tableLayoutPanel1.RowCount = 22;
+                        this.Width += 340;
+                        this.Height += 340;
                         Mines = 99;
                         break;
                 }
@@ -85,7 +87,7 @@ namespace Miinaharawa
 
         private List<Control> SurroundCheck(string Tilename, int A, int B)
         {
-            // Checks all of the surrounding tiles
+            // Checks all of the surrounding tiles, still kinda clueless on how this works but its good enough
 
 
             List<Control> TileList = new List<Control>();
@@ -108,23 +110,23 @@ namespace Miinaharawa
                         {
                             Tilename = string.Format("Tile_{0}-{1}", X, Y);
 
-                            var chosentile = tableLayoutPanel1.Controls.Find(Tilename, false);
+                            var chosentile = tableLayoutPanel1.Controls.Find(Tilename, true);
 
                             TileList.Add(chosentile[0]);
                         }
                     }
                 }
 
-                // Creates the top and bottom numbers, runs on the Y loop so it repeats twice, 
-                // uses the Y loops number for calulations.
+                //Creates the top and bottom numbers, runs on the Y loop so it repeats twice,
+                //uses the Y loops number for calulations.
                 if (A + j >= 0 && A + j < tableLayoutPanel1.ColumnCount)
-                {
-                    Tilename = string.Format("Tile_{0}-{1}", A + j, B);
+                    {
+                        Tilename = string.Format("Tile_{0}-{1}", A + j, B);
 
-                    var chosentile = tableLayoutPanel1.Controls.Find(Tilename, false);
+                        var chosentile = tableLayoutPanel1.Controls.Find(Tilename, true);
 
-                    TileList.Add(chosentile[0]);
-                }
+                        TileList.Add(chosentile[0]);
+                    }
                 j++;
             }
             return TileList;
@@ -133,6 +135,8 @@ namespace Miinaharawa
         private void Game()
         {
             Paintrun = false;
+
+            sp.Start();
 
             for (int i = 0; i < Mines; i++)
             {
@@ -151,8 +155,7 @@ namespace Miinaharawa
 
                     // Little cheat by using the AccessibleName as a secondary tag to avoid messing with the number system
                     Tile[0].AccessibleName = "M";
-                    Tile[0].BackgroundImage = Image.FromFile("C:\\Users\\Findu\\source\\repos\\valikkotehtava\\Miinaharawa\\BaldBoomer.png"); //debug
-
+                    // Tile[0].BackgroundImage = Image.FromFile("C:\\Users\\Findu\\source\\repos\\valikkotehtava\\Miinaharawa\\BaldBoomer.png"); //debug
 
                     MineLocation.Add(tilename);
 
@@ -170,7 +173,7 @@ namespace Miinaharawa
                             {
                                 T.Tag = Convert.ToInt32(T.Tag) + 1;
                             }
-                            T.Text = Convert.ToString(T.Tag); // debug
+                            // T.Text = Convert.ToString(T.Tag); // debug
                         }
                     }
                 }
@@ -179,14 +182,12 @@ namespace Miinaharawa
                     i--;
                 }
             }
-
-
         }
 
         public void TileClick(object sender, MouseEventArgs M)
         {
             Square B = sender as Square;
-            
+
 
             // System.Windows.Forms.MessageBox.Show(B.Name + " ," + B.Tag + " ," + B.Text); // debug
 
@@ -194,7 +195,7 @@ namespace Miinaharawa
             {
                 if (!Flagged.Contains(B) && FlagNum.Text != "0")
                 {
-                    B.BackgroundImage = Image.FromFile(@"C:\Users\Findu\Downloads\Flag.png");
+                    B.BackgroundImage = new Bitmap(Miinaharava.Properties.Resources.Flag);
                     Flagged.Add(B);
                     FlagNum.Text = Convert.ToString(Convert.ToInt32(FlagNum.Text) - 1);
                 }
@@ -204,16 +205,24 @@ namespace Miinaharawa
                     Flagged.Remove(B);
                     FlagNum.Text = Convert.ToString(Convert.ToInt32(FlagNum.Text) + 1);
                 }
-
-               
             }
 
             if (M.Button == MouseButtons.Left)
             {
                 if (B.AccessibleName == "M")
                 {
-                    DialogResult result = System.Windows.Forms.MessageBox.Show("hävisit pelin");
-                    
+                    B.BackgroundImage = new Bitmap(Miinaharava.Properties.Resources.Mine);
+
+                    sp.Stop();
+                    TimeSpan ts = sp.Elapsed;
+
+                    string elapsedTime = String.Format("{0:00} tuntia, {1:00} Minuttia ja {2:00} sekuntia",
+                        ts.Hours, ts.Minutes, ts.Seconds);
+
+                    DialogResult result = System.Windows.Forms.MessageBox.Show("hävisit pelin, sinulla kesti " + elapsedTime);
+
+                    Mines = 0;
+
                     if (result == DialogResult.OK)
                     {
                         button1_Click(sender, M);
@@ -252,9 +261,15 @@ namespace Miinaharawa
 
             if (Mines == Flagged.Count)
             {
-                if (Flagged.All(Item => Item.AccessibleName == "M"))
+                if (Flagged.All(Item => Item.AccessibleName == "M") && Mines > 0)
                 {
-                    DialogResult result = System.Windows.Forms.MessageBox.Show("Voitit pelin!");
+                    sp.Stop();
+                    TimeSpan ts = sp.Elapsed;
+
+                    string elapsedTime = String.Format("{0:00} tuntia, {1:00} Minuttia ja {2:00} sekuntia",
+                        ts.Hours, ts.Minutes, ts.Seconds);
+
+                    DialogResult result = System.Windows.Forms.MessageBox.Show("Voitit pelin!, sinulla kesti " + elapsedTime);
 
                     if (result == DialogResult.OK)
                     {
@@ -271,14 +286,7 @@ namespace Miinaharawa
 
         private void button1_Click(object sender, EventArgs e)
         {
-            // Restarts the game
-            Paintrun = false;
-            tableLayoutPanel1.Controls.Clear();
-            Difficulty = 0;
-            Mines = 0;
-            MineLocation.Clear();
-            this.Invalidate();
-            Form1_Load(sender, e);
+            Application.Restart();
         }
     }
 }
