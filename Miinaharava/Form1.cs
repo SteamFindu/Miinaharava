@@ -13,8 +13,8 @@ namespace Miinaharawa
 {
     public partial class Form1 : Form
     {
-        public int Difficulty = 0;
-        public bool Paintrun = false;
+        private int Difficulty = 0;
+        private bool Paintrun = false;
         private int Mines = 0;
         private List<string> MineLocation = new List<string>();
         private List<Control> AlreadyCleared = new List<Control>();
@@ -26,16 +26,6 @@ namespace Miinaharawa
         {
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             InitializeComponent();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            // Loads the difficulty selector form
-            Form2 form2 = new Form2(this)
-            {
-                TopMost = true
-            };
-            form2.Show();
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -65,6 +55,14 @@ namespace Miinaharawa
                         Mines = 99;
                         break;
                 }
+
+                // Removes the controls that were there by default
+
+                label1.Dispose();
+                numericUpDown1.Dispose();
+                button3.Dispose();
+
+
 
                 FlagNum.Text = Convert.ToString(Mines);
 
@@ -155,7 +153,7 @@ namespace Miinaharawa
 
                     // Little cheat by using the AccessibleName as a secondary tag to avoid messing with the number system
                     Tile[0].AccessibleName = "M";
-                    // Tile[0].BackgroundImage = Image.FromFile("C:\\Users\\Findu\\source\\repos\\valikkotehtava\\Miinaharawa\\BaldBoomer.png"); //debug
+                    // Tile[0].BackgroundImage = new Bitmap(Miinaharava.Properties.Resources.Mine); //debug
 
                     MineLocation.Add(tilename);
 
@@ -287,6 +285,13 @@ namespace Miinaharawa
         private void button1_Click(object sender, EventArgs e)
         {
             Application.Restart();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Difficulty = (int)numericUpDown1.Value;
+            Invalidate();
+            Paintrun = true;
         }
     }
 }
