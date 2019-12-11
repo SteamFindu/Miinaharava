@@ -61,9 +61,7 @@ namespace Miinaharawa
                 label1.Dispose();
                 numericUpDown1.Dispose();
                 button3.Dispose();
-
-
-
+                
                 FlagNum.Text = Convert.ToString(Mines);
 
                 // Creates the buttons
@@ -145,7 +143,7 @@ namespace Miinaharawa
                 string tilename = string.Format("Tile_{0}-{1}", A, B);
 
                 // Checks if the random location already has a mine on it
-                var match = MineLocation.FirstOrDefault(MineLocation => MineLocation.Contains(tilename));
+                var match = MineLocation.FirstOrDefault(Location => Location.Contains(tilename));
 
                 if (match == null)
                 {
